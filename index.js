@@ -9,6 +9,24 @@ const pool = new Pool({
   ssl: true
 });
 
+var usersRouter = require('./routes/users');
+
+var MongoClient = require('mongodb').MongoClient;
+var url = process.env.MONGODB_URI;
+console.log(url);
+
+MongoClient.connect(url, function (err, client) {
+  if (err) throw err
+
+  var db = client.db('heroku_48jsz1bx')
+
+  db.collection('joueur').find().toArray(function (err, result) {
+    if (err) throw err
+
+    console.log(result)
+  })
+})
+
 express()
   .use(express.static(path.join(__dirname, 'public')))
   .set('views', path.join(__dirname, 'views'))
@@ -34,4 +52,5 @@ express()
       res.send("Error " + err);
     }
   })
+  .use('/users', usersRouter)
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
