@@ -10,6 +10,7 @@ const pool = new Pool({
 });
 
 var usersRouter = require('./routes/users');
+var tournoisRouter = require('./routes/tournois');
 
 var MongoClient = require('mongodb').MongoClient;
 var url = process.env.MONGODB_URI;
@@ -58,4 +59,5 @@ express()
     }
   })
   .use('/users', usersRouter)
+  .use('/tournois', tournoisRouter)
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
