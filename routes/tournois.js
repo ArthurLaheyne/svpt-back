@@ -19,7 +19,7 @@ router.get('/', function(req, res, next) {
       if (err)
         throw err
       else {
-        db.collection('tournoi').find().toArray(function (err, tournois) {
+        db.collection('tournoi').find().sort( { id: 1 } ).toArray(function (err, tournois) {
           if (err)
             throw err
           else {
