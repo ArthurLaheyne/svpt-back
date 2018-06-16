@@ -47,6 +47,9 @@ passport.use(new FacebookStrategy({
     done(null, profile);
   }
 ));
+passport.serializeUser(function(user, done) {
+  done(null, user);
+});
 
 
 express()
