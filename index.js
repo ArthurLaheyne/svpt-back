@@ -43,7 +43,6 @@ passport.use(new FacebookStrategy({
     callbackURL: "https://guarded-shelf-83545.herokuapp.com/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
-    if (err) { return done(err); }
     done(null, profile);
   }
 ));
