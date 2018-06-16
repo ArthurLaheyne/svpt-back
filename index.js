@@ -81,7 +81,7 @@ express()
   })
   .get('/auth/facebook', passport.authenticate('facebook'))
   .get('/auth/facebook/callback', passport.authenticate('facebook', {
-    successRedirect: '/',
-    failureRedirect: '/login'
+    successRedirect: '/users',
+    failureRedirect: '/'
   }))
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))
