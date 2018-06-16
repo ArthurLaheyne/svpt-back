@@ -40,7 +40,7 @@ MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
 passport.use(new FacebookStrategy({
     clientID: '2593367260889259',
     clientSecret: 'db10676e7ef9ed3cc65ebc586918b0ab',
-    callbackURL: "https://evening-beach-82472.herokuapp.com/auth/facebook/callback"
+    callbackURL: "https://guarded-shelf-83545.herokuapp.com/auth/facebook/callback"
   },
   function(accessToken, refreshToken, profile, done) {
     db.collection('joueur').findOne({ username: profile.name }, function(err, user) {
