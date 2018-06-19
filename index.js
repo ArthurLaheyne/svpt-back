@@ -2,9 +2,7 @@ const cool = require('cool-ascii-faces')
 const express = require('express')
 const path = require('path')
 const passport = require('passport')
-const LocalStrategy = require('passport-local').Strategy;
-const OAuth2Strategy = require('passport-oauth').OAuth2Strategy;
-const FacebookStrategy = require('passport-facebook').Strategy;
+const FacebookTokenStrategy = require('passport-facebook-token');
 const session = require("express-session")
 const bodyParser = require("body-parser");
 const flash = require('connect-flash');
@@ -23,26 +21,10 @@ MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
   })
 })
 
-// passport.use(new LocalStrategy(
-//   function(username, password, done) {
-//     db.collection('joueur').findOne({ username: username }, function(err, user) {
-//       if (err) { return done(err); }
-//       if (!user) {
-//         return done(null, false, { message: 'Incorrect username.' });
-//       }
-//       if (!user.validPassword(password)) {
-//         return done(null, false, { message: 'Incorrect password.' });
-//       }
-//       return done(null, user);
-//     });
-//   }
-// ));
-passport.use(new FacebookStrategy({
+passport.use(new FacebookTokenStrategy({
     clientID: '2593367260889259',
-    clientSecret: 'db10676e7ef9ed3cc65ebc586918b0ab',
-    callbackURL: "https://guarded-shelf-83545.herokuapp.com/auth/facebook/callback"
-  },
-  function(accessToken, refreshToken, profile, done) {
+    clientSecret: 'db10676e7ef9ed3cc65ebc586918b0ab'
+  }, function(accessToken, refreshToken, profile, done) {
     console.log("Auth done");
     done(null, profile);
   }
@@ -66,6 +48,7 @@ express()
   .use(function(req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.header('Access-Control-Allow-Headers: Origin, Content-Type, X-Auth-Token');
     next();
   })
   .set('views', path.join(__dirname, 'views'))
@@ -73,21 +56,23 @@ express()
   .get('/', (req, res) => res.render('pages/index'))
   .use('/users', usersRouter)
   .use('/tournois', tournoisRouter)
-  .use('/login-failed', usersRouter)
-  .use('/login-success', tournoisRouter)
-  .post('/login', function(req, res, next) {
-    passport.authenticate('local', function(err, user, info) {
-      if (err) { return next(err); }
-      if (!user) { return res.json('success'); }
-      req.logIn(user, function(err) {
-        if (err) { return next(err); }
-        return res.json('failed');
-      });
-    })(req, res, next);
-  })
-  .get('/auth/facebook', passport.authenticate('facebook'))
-  .get('/auth/facebook/callback', passport.authenticate('facebook', {
-    successRedirect: '/users',
-    failureRedirect: '/'
-  }))
+  .post('/auth/facebook/token',
+    passport.authenticate('facebook-token'),
+    function (req, res) {
+      // do something with req.user
+      if (req.user) {
+        MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
+          if (err) throw err
+          var db = client.db('heroku_48jsz1bx')
+          db.collection('joueur').find().toArray(function (err, result) {
+            if (err) throw err
+            res.json({joueur: result[0]})
+            res.send();
+          })
+        })
+      } else {
+        res.send(401);
+      }
+    }
+  )
   .listen(PORT, () => console.log(`Listening on ${ PORT }`))

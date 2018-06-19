@@ -9,6 +9,11 @@ router.get('/', function(req, res, next) {
 	// Comment out this line:
   //res.send('respond with a resource');
 
+  let retUser = null;
+  let retData = null;
+  if (req.user) {
+    retUser = req.user;
+  }
   // And insert something like this instead:
   MongoClient.connect(url, function (err, client) {
     if (err) throw err
@@ -17,7 +22,11 @@ router.get('/', function(req, res, next) {
 
     db.collection('joueur').find().toArray(function (err, result) {
       if (err) throw err
-      res.json(result);
+      retData = result;
+      res.json({
+        user: retUser,
+        data: retData
+      })
     })
     // res.json([{
     // 	id: 1,
