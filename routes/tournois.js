@@ -30,11 +30,22 @@ router.get('/', function(req, res, next) {
             throw err
           else {
             tournois.forEach( (tournoi, i) => {
+              let joueur = joueurs.find( (element) => {
+                return element._id == tournoi.resultat[0].joueur;
+              })
+              if (joueur.victoires === undefined) {
+                joueur.victoires = 1;
+              } else {
+                joueur.victoires += 1;
+              }
+            })
+            tournois.forEach( (tournoi, i) => {
               tournoi.resultat.forEach( (resultat, i2) => {
                 tournois[i].resultat[i2].joueur = joueurs.find( (element) => {
                   return element._id == resultat.joueur;
                 })
               })
+              tournoi.premier = tournoi.resultat[0].joueur;
             })
             retData = tournois;
             res.json({
