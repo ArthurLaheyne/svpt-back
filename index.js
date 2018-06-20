@@ -65,9 +65,9 @@ express()
           console.log(req.user);
           if (err) throw err
           var db = client.db('heroku_48jsz1bx')
-          db.collection('joueur').find({facebookId: req.user.id}).toArray(function (err, result) {
+          db.collection('joueur').findOne({facebookId: req.user.id}, function (err, result) {
             if (err) throw err
-            res.json({joueur: result[0]})
+            res.json({joueur: result})
             res.send();
           })
         })
