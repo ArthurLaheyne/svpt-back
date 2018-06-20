@@ -62,9 +62,10 @@ express()
       // do something with req.user
       if (req.user) {
         MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
+          console.log(req.user);
           if (err) throw err
           var db = client.db('heroku_48jsz1bx')
-          db.collection('joueur').find().toArray(function (err, result) {
+          db.collection('joueur').find({facebookId: req.user.id}).toArray(function (err, result) {
             if (err) throw err
             res.json({joueur: result[0]})
             res.send();
