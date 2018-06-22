@@ -10,16 +10,17 @@ const PORT = process.env.PORT || 5000
 
 var usersRouter = require('./routes/users');
 var tournoisRouter = require('./routes/tournois');
+var giphynewsRouter = require('./routes/giphynews');
 
 var MongoClient = require('mongodb').MongoClient;
-MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
-  if (err) throw err
-  var db = client.db('heroku_48jsz1bx')
-  db.collection('joueur').find().toArray(function (err, result) {
-    if (err) throw err
-    console.log(result)
-  })
-})
+// MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
+//   if (err) throw err
+//   var db = client.db('heroku_48jsz1bx')
+//   db.collection('joueur').find().toArray(function (err, result) {
+//     if (err) throw err
+//     console.log(result)
+//   })
+// })
 
 passport.use(new FacebookTokenStrategy({
     clientID: '2593367260889259',
@@ -41,7 +42,7 @@ express()
   .use(express.static("public"))
   .use(session({ secret: "cats" }))
   .use(bodyParser.json()) // support json encoded bodies
-  .use(bodyParser.urlencoded({ extended: false }))
+  .use(bodyParser.urlencoded({ extended: true }))
   .use(passport.initialize())
   .use(passport.session())
   .use(flash())
@@ -56,6 +57,27 @@ express()
   .get('/', (req, res) => res.render('pages/index'))
   .use('/users', usersRouter)
   .use('/tournois', tournoisRouter)
+  .use('/giphynews', giphynewsRouter)
+  .post('/giphynew', function (req, res) {
+    // do something with req.user
+    if (req.body.text && req.body.backgroundColor && req.body.color && req.body.gifUrl) {
+      MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
+        if (err) throw err
+        var db = client.db('heroku_48jsz1bx')
+        db.collection('giphynew').insert({
+          text: req.body.text,
+          backgroundColor: req.body.backgroundColor,
+          color: req.body.color,
+          gifUrl: req.body.gifUrl,
+        }, function (err, result) {
+          if (err) throw err
+          res.send(200);
+        })
+      })
+    } else {
+      res.send(401);
+    }
+  })
   .post('/auth/facebook/token',
     passport.authenticate('facebook-token'),
     function (req, res) {
