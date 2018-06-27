@@ -64,14 +64,30 @@ express()
       MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
         if (err) throw err
         var db = client.db('heroku_48jsz1bx')
-        db.collection('giphynew').insert({
-          text: req.body.text,
-          backgroundColor: req.body.backgroundColor,
-          color: req.body.color,
-          gifUrl: req.body.gifUrl,
-        }, function (err, result) {
+        db.collection('joueur').findOne({facebookId: req.body.facebookId}, function (err, result) {
           if (err) throw err
-          res.send(200);
+          console.log(req.body.facebookId, result);
+          const joueur = result;
+          if (joueur.gifTokens > 0) {
+            db.collection('giphynew').insert({
+              text: req.body.text,
+              backgroundColor: req.body.backgroundColor,
+              color: req.body.color,
+              gifUrl: req.body.gifUrl,
+            }, function (err, result) {
+              if (err) throw err
+              console.log(joueur._id);
+              db.collection('joueur').update(
+                { _id: joueur._id },
+                {
+                  $inc: { gifTokens: -1 }
+                }
+              )
+              res.send(200);
+            })
+          } else {
+            res.send(401);
+          }
         })
       })
     } else {
