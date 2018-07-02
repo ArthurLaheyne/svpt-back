@@ -94,6 +94,29 @@ express()
       res.send(401);
     }
   })
+  .post('/giphynew/addTokens', function (req, res) {
+    console.log(req.body);
+    // do something with req.user
+    if (req.body.quantite && req.body.pseudo) {
+      MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
+        if (err) throw err
+        var db = client.db('heroku_48jsz1bx')
+        db.collection('joueur').findOne({pseudo: req.body.pseudo}, function (err, result) {
+          if (err) throw err
+          const joueur = result;
+          db.collection('joueur').update(
+            { _id: joueur._id },
+            {
+              $inc: { gifTokens: 1 }
+            }
+          )
+          res.send(200);
+        })
+      })
+    } else {
+      res.send(401);
+    }
+  })
   .post('/auth/facebook/token',
     passport.authenticate('facebook-token'),
     function (req, res) {
