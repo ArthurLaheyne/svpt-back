@@ -60,7 +60,7 @@ express()
   .use('/giphynews', giphynewsRouter)
   .post('/giphynew', function (req, res) {
     // do something with req.user
-    if (req.body.text && req.body.backgroundColor && req.body.color && req.body.gifUrl) {
+    if (req.body.html) {
       MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
         if (err) throw err
         var db = client.db('heroku_48jsz1bx')
@@ -70,10 +70,9 @@ express()
           const joueur = result;
           if (joueur.gifTokens > 0) {
             db.collection('giphynew').insert({
-              text: req.body.text,
-              backgroundColor: req.body.backgroundColor,
-              color: req.body.color,
-              gifUrl: req.body.gifUrl,
+              body: req.body.html,
+              publishedAt: Date.now(),
+              author: joueur.pseudo,
             }, function (err, result) {
               if (err) throw err
               console.log(joueur._id);

@@ -21,7 +21,7 @@ router.get('/', function(req, res, next) {
 
     var db = client.db('heroku_48jsz1bx')
 
-    db.collection('giphynew').find().sort( { id: 1 } ).toArray(function (err, docs) {
+    db.collection('giphynew').find().sort( { publishedAt: -1 } ).toArray(function (err, docs) {
       if (err)
         throw err
       else {
