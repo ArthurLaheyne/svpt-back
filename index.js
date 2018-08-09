@@ -93,6 +93,22 @@ express()
       res.send(401);
     }
   })
+  .post('/user', function (req, res) {
+    // do something with req.user
+    if (req.body.facebookId) {
+      MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
+        if (err) throw err
+        var db = client.db('heroku_48jsz1bx')
+        db.collection('joueur').findOne({facebookId: req.body.facebookId}, function (err, result) {
+          if (err) throw err
+          res.json({joueur: result})
+          res.send();
+        })
+      })
+    } else {
+      res.send(401);
+    }
+  })
   .post('/giphynew/addTokens', function (req, res) {
     console.log(req.body);
     // do something with req.user
