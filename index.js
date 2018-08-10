@@ -109,6 +109,37 @@ express()
       res.send(401);
     }
   })
+  .post('/tournoi', function (req, res) {
+    // do something with req.user
+    if (req.body.tournoi) {
+      MongoClient.connect(process.env.MONGODB_URI, function (err, client) {
+        if (err) throw err
+        var db = client.db('heroku_48jsz1bx')
+        // db.collection('joueur').findOne({facebookId: req.body.facebookId}, function (err, result) {
+          if (err) throw err
+          // console.log(req.body.facebookId, result);
+          // const joueur = result;
+          // if (joueur.gifTokens > 0) {
+            db.collection('tournoi').insert(req.body.tournoi, function (err, result) {
+              if (err) throw err
+              // console.log(joueur._id);
+              // db.collection('joueur').update(
+              //   { _id: joueur._id },
+              //   {
+              //     $inc: { gifTokens: -1 }
+              //   }
+              // )
+              res.send(200);
+            })
+          // } else {
+          //   res.send(401);
+          // }
+        // })
+      })
+    } else {
+      res.send(401);
+    }
+  })
   .post('/giphynew/addTokens', function (req, res) {
     console.log(req.body);
     // do something with req.user
