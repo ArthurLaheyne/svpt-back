@@ -8,6 +8,7 @@ const bodyParser = require("body-parser");
 const flash = require('connect-flash');
 const PORT = process.env.PORT || 5000
 
+require('dotenv').config();
 var usersRouter = require('./routes/users');
 var tournoisRouter = require('./routes/tournois');
 var giphynewsRouter = require('./routes/giphynews');
